@@ -351,9 +351,9 @@ plot_stations()
 Let's say we want to study rainfall at a particular point. We'll use Rice University in Houston as our example:
 
 ```{julia}
-target_location = "Rice University"  # <1>
-target_lon = -95.404970              # <2>
-target_lat = 29.718952               # <3>
+target_location = "Baylor County"  # <1>
+target_lon = 34.16           # <2>
+target_lat = -99.68              # <3>
 ```
 
 1. Descriptive name for our target location (change this for different places!)
@@ -500,9 +500,11 @@ Now we'll work with a GEV distribution to create return period plots and compare
 ```{julia}
 # GEV parameters for Houston area (units: inches)
 # Try modifying these values to better fit your data!
-μ = 4.0    # Location parameter - shifts the distribution left/right
-σ = 1.3    # Scale parameter - controls spread (must be > 0)
-ξ = 0.15   # Shape parameter - controls tail behavior
+μ = 3    # Location parameter - shifts the distribution left/right #it was 4 
+σ = 1.5    # Scale parameter - controls spread (must be > 0) 
+##1.3 to begin with 
+ξ = .1   # Shape parameter - controls tail behavior
+##0.15 to begin with 
 
 houston_gev = GeneralizedExtremeValue(μ, σ, ξ)  # <1>
 ```
@@ -587,6 +589,7 @@ function plot_empirical_vs_theoretical(station_data, gev_dist, station_info)
 
 	# Add empirical data with Weibull positions
 	emp_levels, emp_periods = weibull_plotting_positions(station_data.rainfall)
+	emp_levels = ustrip.(u"inch", emp_levels)
 	scatter!(ax, emp_periods, emp_levels,
 		color = :red, markersize = 10,
 		label = "Observed Data (Weibull positions)")  # <6>
@@ -607,13 +610,23 @@ Explore the rainfall data to find one station where there *appears* to be a posi
 
 **Station with apparent positive trend:**
 
+
 *Write your answer here. Include the station name/ID and explain what you observe in the data that suggests an increasing trend.*
 
+Station name: Bronwsville 
+ID: 79-0043
+
+With the exception of strong postive outlier in the late 1960's and the early 1980's, over time, the annual maximum rainfall increases (frequency of higher maximum rainfall increases following 1980's). 
 
 
 **Station with apparent negative trend:**
 
 *Write your answer here. Include the station name/ID and explain what you observe in the data that suggests a decreasing trend.*
+
+Station name: Mercedes 6 SSE
+ID: 41-5836
+When observing the rainfall data in the 4 stations nearest to Lubbock, I noted that, with the exception of some outlier (ex: large outlier in 2023), the station data trends began to decrease as the data approaches 2025. 
+
 
 
 
@@ -624,40 +637,42 @@ Explore the rainfall data to find one station where there *appears* to be a posi
 *Record your starting parameters and the final parameters you chose after experimentation:*
 
 - Starting: $\mu = 4.0$, $\sigma = 1.3$, $\xi = 0.15$
-- Final: $\mu = \ldots$ $\sigma = \ldots$, $\xi = \ldots$
+- Final: $\mu = 3$ $\sigma =1.5$, $\xi = 0.1$
 
 **Parameter Effects:**
 
 **What happened when you increased/decreased $\mu$ (location parameter)?**
 
-*Test values like $\mu = 2.0, 4.0, 6.0$. Describe how the entire GEV curve shifted and how this affected the fit to your red data points.*
+When the location parameter is increased, the GEV Model shifted upwards. When the location parameter was decreased,  the GEV Model shifted downwards. 
 
+
+*Test values like $\mu = 2.0, 4.0, 6.0$. Describe how the entire GEV curve shifted and how this affected the fit to your red data points.*
+As mu values moved farther away from the ideal mu parameter (mu=3 or 4), the GEV curve did a worse job at fitting the red data points. 
 
 
 **What happened when you increased/decreased $\sigma$ (scale parameter)?**
 
 *Test values like $\sigma = 0.8, 1.3, 2.0$. Describe how the curve became steeper/flatter and how this affected the spread of return levels.*
-
+As sigma values approach 0, the curve becomes flatter, and the spread of return levels decreases. As sigma values increase, the curve becomes steeper, and the spread of return values increase. 
 
 
 **What happened when you changed $\xi$ (shape parameter)?** 
 
 *Test $\xi = -0.1$ (light tail), $\xi = 0.0$ (Gumbel), $\xi = 0.15$, $\xi = 0.3$ (heavy tail). Focus on how the high return period end (right side) of the curve changed.*
 
+Lower xi values the curve flattened and tended to fit extremes in the leftward part of the distribution.In contrast, higher xi values fit the outlier on the right side of the distribition better. 
 
 
 **Final Assessment:**
 
 **How well does your best-fit GEV distribution represent the closest station's data?**
+My best-fit GEV distribtuon represents the closest station data well. The red dots follow the blue curve closely,  with exceptions at return periods of around 60 and 135 years. 
 
 *Do the red dots follow your blue curve? Where are the biggest deviations?*
-
 
 
 **Additional observations:**
 
 *Optional: Add any other interesting patterns you notice in the return period analysis.*
 
-
-
-
+It was interesting to see the GEV curve take the shape of different functions as you changed the parameters. When I was messing with the parameters, I saw the GEV curve look like a square root function, 1/x, and more. 
